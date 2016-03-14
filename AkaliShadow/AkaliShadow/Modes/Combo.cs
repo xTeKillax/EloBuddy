@@ -29,6 +29,7 @@ namespace AkaliShadow.Modes
 
             Combat.CastItems(target);
 
+            //If marked we will do everything to proc it
             if (Combat.HasBuff(target, "AkaliMota"))
             {
                 if(Player.Instance.Distance(target) <= Player.Instance.GetAutoAttackRange())
@@ -37,8 +38,12 @@ namespace AkaliShadow.Modes
                 }
                 else
                 {
-                    //Jump with R if dist > AARange and have enough energy for R+E
-                    if (Player.Instance.Distance(target) <= R.Range && Combat.HasEnergyFor(false, false, false, true) && R.IsReady() && Config.Modes.Combo.UseR && (lastRattempt + Config.Modes.Combo.Rdelay) <= Environment.TickCount)
+                    //if E he's not in AA range but in E range and E can kill him
+                    if (E.IsReady() && E.IsInRange(target) && (Player.Instance.GetSpellDamage(target, SpellSlot.E) >= target.Health) && Config.Modes.Combo.UseE)
+                        E.Cast();
+
+                    //Jump with R to gapclose
+                    if (R.IsInRange(target) && R.IsReady() && Config.Modes.Combo.UseR && (lastRattempt + Config.Modes.Combo.Rdelay) <= Environment.TickCount)
                     {
                         R.Cast(target);
                         lastRattempt = Environment.TickCount;
@@ -48,17 +53,22 @@ namespace AkaliShadow.Modes
             else
             {
                 //Mark Q on enemy if not marked
-                if (Q.IsReady() && Player.Instance.Distance(target) <= Q.Range && !Combat.HasBuff(target, "AkaliMota") && Config.Modes.Combo.UseQ)
+                if (Q.IsReady() && Q.IsInRange(target) && Config.Modes.Combo.UseQ)
                 {
                     Q.Cast(target);
                     Program.QInAir = true;
                 }
 
+                //If Q in air, we have time to E before we force AA, so lets do it for a faster combo only if we have enough energy to jump
+                if (E.IsReady() && E.IsInRange(target) && (Player.Instance.GetSpellDamage(target, SpellSlot.E) >= target.Health) && Config.Modes.Combo.UseE)
+                    E.Cast();
+
                 //Jump with R if dist > E.Range and have enough energy for R+E
-                if (Player.Instance.Distance(target) <= R.Range
-                    && ((Player.Instance.Distance(target) > E.Range && (Combat.HasEnergyFor(false, false, true, true) || Combat.HasBuff(target, "AkaliMota")))
-                    || (Player.Instance.GetSpellDamage(target, SpellSlot.R) + Player.Instance.GetAutoAttackDamage(target, true)) >= target.Health)
-                    && R.IsReady() && Config.Modes.Combo.UseR && (lastRattempt + Config.Modes.Combo.Rdelay) <= Environment.TickCount)
+                //Jump with R if can kill him with R+AA
+                if (R.IsInRange(target) &&
+                    ((!(E.IsInRange(target)) && Combat.HasEnergyFor(false, false, true, true)) || 
+                    (Player.Instance.GetSpellDamage(target, SpellSlot.R) + Player.Instance.GetAutoAttackDamage(target, true)) >= target.Health) && 
+                    R.IsReady() && Config.Modes.Combo.UseR && (lastRattempt + Config.Modes.Combo.Rdelay) <= Environment.TickCount)
                 {
                     R.Cast(target);
                     lastRattempt = Environment.TickCount;

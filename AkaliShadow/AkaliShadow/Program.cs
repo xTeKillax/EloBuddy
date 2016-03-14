@@ -26,7 +26,7 @@ namespace AkaliShadow
         private static ColorBGRA RColor = new ColorBGRA(0, 0, 0, 100);
         private static ColorBGRA EColor = new ColorBGRA(63, 212, 242, 100);
         private static ColorBGRA QColor = new ColorBGRA(242, 188, 63, 100);
-        private static ColorBGRA spotColor = new ColorBGRA(63, 63, 242, 100);
+        private static ColorBGRA spotColor = new ColorBGRA(150, 150, 242, 255);
 
         public const string ChampName = "Akali";
         #endregion
@@ -78,7 +78,7 @@ namespace AkaliShadow
         private static void OnPostAttack(AttackableUnit target, EventArgs args)
         {
             if (Orbwalker.ActiveModesFlags.HasFlag(Orbwalker.ActiveModes.Combo))
-                if (SpellManager.E.IsReady() && Config.Modes.Combo.UseE && target.Type == GameObjectType.AIHeroClient)
+                if (SpellManager.E.IsReady() && Config.Modes.Combo.UseE && target.Type == GameObjectType.AIHeroClient && target.IsValidTarget(SpellManager.E.Range))
                     SpellManager.E.Cast();
         }
 

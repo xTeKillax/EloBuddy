@@ -20,9 +20,8 @@ namespace AkaliShadow
         {
             // Initialize the menu
             Menu = MainMenu.AddMenu(MenuName, MenuName.ToLower());
-            Menu.AddGroupLabel("Welcome to this AddonTemplate!");
-            Menu.AddLabel("To change the menu, please have a look at the");
-            Menu.AddLabel("Config.cs class inside the project, now have fun!");
+            Menu.AddLabel("Akali Shadow - by BestAkaliAfrica");
+            Menu.AddLabel("Say NO! to shitty-logic addons!");
 
             // Initialize the modes
             Modes.Initialize();
