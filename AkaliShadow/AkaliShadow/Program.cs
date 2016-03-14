@@ -56,6 +56,8 @@ namespace AkaliShadow
             Obj_AI_Base.OnProcessSpellCast += OnProcessSpellCast;
             Game.OnWndProc += OnWndProc;
             Orbwalker.OnPostAttack += OnPostAttack;
+
+            Chat.Print("<font color = \"#6B9FE3\">Akali Shadow</font><font color = \"#E3AF6B\"> by BestAkaliAfrica</font>. You like ? Buy me a coffee :p");
         }
 
         private static void AntiGapcloser_OnEnemyGapcloser(AIHeroClient sender, Gapcloser.GapcloserEventArgs gapcloser)
@@ -107,13 +109,13 @@ namespace AkaliShadow
             if (Player.Instance.IsDead || Shop.IsOpen) 
                 return;
 
-            if (Config.Drawings.Qrange && SpellManager.Q.IsReady())
+            if (Config.Drawings.Qrange)
                 Circle.Draw(QColor, SpellManager.Q.Range, Player.Instance.Position);
 
-            if (Config.Drawings.Erange && SpellManager.E.IsReady())
+            if (Config.Drawings.Erange)
                 Circle.Draw(EColor, SpellManager.E.Range, Player.Instance.Position);
 
-            if (Config.Drawings.Rrange && SpellManager.R.IsReady())
+            if (Config.Drawings.Rrange)
                 Circle.Draw(RColor, SpellManager.R.Range, Player.Instance.Position);
 
 
@@ -147,7 +149,6 @@ namespace AkaliShadow
                 //is the key for wSpotActive ?
                 if (Config.Misc.wSpotActive)
                 {
-                    Chat.Print("ON");
                     _drawWspots = true;
                 }
 
