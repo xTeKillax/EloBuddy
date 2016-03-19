@@ -11,6 +11,7 @@ namespace AkaliShadow.Modes
     public sealed class Combo : ModeBase
     {
         private static int lastRattempt;
+        private static int randomRdelay = (new System.Random()).Next(100, 1500);
 
         public override bool ShouldBeExecuted()
         {
@@ -43,10 +44,11 @@ namespace AkaliShadow.Modes
                         E.Cast();
 
                     //Jump with R to gapclose
-                    if (R.IsInRange(target) && R.IsReady() && Config.Modes.Combo.UseR && (lastRattempt + Config.Modes.Combo.Rdelay) <= Environment.TickCount)
+                    if (R.IsInRange(target) && R.IsReady() && Config.Modes.Combo.UseR && (lastRattempt + Config.Modes.Combo.Rdelay + (Config.Modes.Combo.Rrnd ? 0 : randomRdelay)) <= Environment.TickCount)
                     {
                         R.Cast(target);
                         lastRattempt = Environment.TickCount;
+                        if (Config.Modes.Combo.Rrnd) randomRdelay = (new System.Random()).Next(100, 1500);
                     }
                 }
             }
@@ -67,11 +69,12 @@ namespace AkaliShadow.Modes
                 //Jump with R if can kill him with R+AA
                 if (R.IsInRange(target) &&
                     ((!(E.IsInRange(target)) && Combat.HasEnergyFor(false, false, true, true)) || 
-                    (Player.Instance.GetSpellDamage(target, SpellSlot.R) + Player.Instance.GetAutoAttackDamage(target, true)) >= target.Health) && 
-                    R.IsReady() && Config.Modes.Combo.UseR && (lastRattempt + Config.Modes.Combo.Rdelay) <= Environment.TickCount)
+                    (Player.Instance.GetSpellDamage(target, SpellSlot.R) + Player.Instance.GetAutoAttackDamage(target, true)) >= target.Health) &&
+                    R.IsReady() && Config.Modes.Combo.UseR && (lastRattempt + Config.Modes.Combo.Rdelay + (Config.Modes.Combo.Rrnd ? 0 : randomRdelay)) <= Environment.TickCount)
                 {
                     R.Cast(target);
                     lastRattempt = Environment.TickCount;
+                    if (Config.Modes.Combo.Rrnd) randomRdelay = (new System.Random()).Next(100, 1500);
                 }
             }
         }

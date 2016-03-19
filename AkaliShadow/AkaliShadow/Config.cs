@@ -78,6 +78,10 @@ namespace AkaliShadow
                 {
                     get { return ComboMenu["Rdelay"].Cast<Slider>().CurrentValue; }
                 }
+                public static bool Rrnd
+                {
+                    get { return ComboMenu["Rrnd"].Cast<CheckBox>().CurrentValue; }
+                }
 
                 static Combo()
                 {
@@ -87,6 +91,7 @@ namespace AkaliShadow
                     ComboMenu.Add("comboUseE", new CheckBox("Use E"));
                     ComboMenu.Add("comboUseR", new CheckBox("Use R"));
                     ComboMenu.Add("Rdelay", new Slider("Delay between R", 1000, 0, 2000));
+                    ComboMenu.Add("Rrnd", new CheckBox("Add random R delay to existing delay"));
                 }
 
                 public static void Initialize()
