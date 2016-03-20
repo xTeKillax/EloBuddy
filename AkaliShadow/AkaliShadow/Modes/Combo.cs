@@ -21,7 +21,7 @@ namespace AkaliShadow.Modes
 
         public override void Execute()
         {
-            var target = TargetSelector.GetTarget(Q.Range, DamageType.Physical);
+            var target = TargetSelector.GetTarget(Q.Range, DamageType.Magical);
 
             if (target == null)
                 return;
