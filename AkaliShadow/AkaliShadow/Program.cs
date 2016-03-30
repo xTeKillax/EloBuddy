@@ -131,7 +131,6 @@ namespace AkaliShadow
                 int remainingTime = 8 - ((Environment.TickCount - _wTick) / 1000);
                 if (remainingTime > 0)
                 {
-                    Vector2 drawPos = Drawing.WorldToScreen(Player.Instance.Position);
                     _wCountdownText.Position = Drawing.WorldToScreen(Player.Instance.Position);
                     _wCountdownText.TextValue = remainingTime.ToString();
                     _wCountdownText.Draw();
