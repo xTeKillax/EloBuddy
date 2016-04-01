@@ -1,9 +1,9 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 2013
-VisualStudioVersion = 12.0.31101.0
+VisualStudioVersion = 12.0.40629.0
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BaseUlt++", "BaseUlt++.csproj", "{BF4E585C-BA01-42EF-8C82-F24B110E0067}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BaseUlt-3x", "BaseUlt-3x.csproj", "{BF4E585C-BA01-42EF-8C82-F24B110E0067}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

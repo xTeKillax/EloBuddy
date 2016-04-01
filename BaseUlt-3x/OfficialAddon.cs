@@ -22,6 +22,8 @@ namespace BaseUltPlusPlus
         private static readonly List<Recall> Recalls = new List<Recall>();
         private static readonly List<BaseUltUnit> BaseUltUnits = new List<BaseUltUnit>();
         private static readonly List<BaseUltSpell> BaseUltSpells = new List<BaseUltSpell>();
+        private static readonly List<EnemyInfo> enemiesInfo = new List<EnemyInfo>();
+
         private static readonly AIHeroClient Player = ObjectManager.Player;
         private static SpellDataInst Ultimate;
         
@@ -35,26 +37,32 @@ namespace BaseUltPlusPlus
 
         public static void Initialize()
         {
-            Text = new Font(Drawing.Direct3DDevice, new FontDescription { FaceName = "Calibri", Height = 13, Width = 6, OutputPrecision = FontPrecision.Default, Quality = FontQuality.Default });
+            Text = new Font(Drawing.Direct3DDevice, new FontDescription { FaceName = "Calibri", Height = 23, Width = 12, OutputPrecision = FontPrecision.Default, Quality = FontQuality.Default });
 
             #region Spells
 
-            BaseUltSpells.Add(new BaseUltSpell("Ezreal", SpellSlot.R, 1000, 2000, 160, false));
-            BaseUltSpells.Add(new BaseUltSpell("Jinx", SpellSlot.R, 600, 1700, 140, true));
-            BaseUltSpells.Add(new BaseUltSpell("Ashe", SpellSlot.R, 250, 1600, 130, true));
-            BaseUltSpells.Add(new BaseUltSpell("Draven", SpellSlot.R, 400, 2000, 160, true));
-            BaseUltSpells.Add(new BaseUltSpell("Karthus", SpellSlot.R, 3125, 0, 0, false));
-            BaseUltSpells.Add(new BaseUltSpell("Ziggs", SpellSlot.Q, 250, 3100, 0, false));
-            BaseUltSpells.Add(new BaseUltSpell("Lux", SpellSlot.R, 1375, 0, 0, false));
-            BaseUltSpells.Add(new BaseUltSpell("Xerath", SpellSlot.R, 700, 600, 0, false));
+            BaseUltSpells.Add(new BaseUltSpell("Ezreal", SpellSlot.R, 1000 / 1000f, 2000, 160, false));
+            BaseUltSpells.Add(new BaseUltSpell("Jinx", SpellSlot.R, 600 / 1000f, 1700, 140, true));
+            BaseUltSpells.Add(new BaseUltSpell("Ashe", SpellSlot.R, 250 / 1000f, 1600, 130, true));
+            BaseUltSpells.Add(new BaseUltSpell("Draven", SpellSlot.R, 400 / 1000f, 2000, 160, true));
+            BaseUltSpells.Add(new BaseUltSpell("Karthus", SpellSlot.R, 3125 / 1000f, 0, 0, false));
+            BaseUltSpells.Add(new BaseUltSpell("Ziggs", SpellSlot.Q, 250 / 1000f, 3100, 0, false));
+            BaseUltSpells.Add(new BaseUltSpell("Lux", SpellSlot.R, 1375 / 1000f, 0, 0, false));
+            BaseUltSpells.Add(new BaseUltSpell("Xerath", SpellSlot.R, 700 / 1000f, 600, 0, false));
 
             #endregion
 
             Ultimate = Player.Spellbook.GetSpell(BaseUltSpells.Find(h => h.Name == Player.ChampionName).Slot);
+
+            foreach (var enemy in EntityManager.Heroes.Enemies)
+                enemiesInfo.Add(new EnemyInfo(enemy));
         }
         //compatibleChamps.Any(h => h == Player.ChampionName)
         public static void Game_OnUpdate()
         {
+            foreach (EnemyInfo enemy in enemiesInfo.Where(x => x.Player.IsVisible))
+                enemy.LastSeen = Core.GameTickCount;
+
             foreach (var recall in Recalls)
             {
                 //Compute
@@ -68,17 +76,44 @@ namespace BaseUltPlusPlus
 
             foreach (var unit in BaseUltUnits)
             {
-                if (unit.Unit.IsVisible)
-                    unit.LastSeen = Game.Time;
-
                 var timeLimit = Program.BaseUltMenu["timeLimit"].Cast<Slider>().CurrentValue;
 
-                if (Math.Round(unit.FireTime, 1) <= Core.GameTickCount && ((Game.Time - timeLimit) >= unit.LastSeen))
+                if (Math.Round(unit.FireTime, 1) <= Core.GameTickCount && ((Core.GameTickCount - timeLimit) >= enemiesInfo.FirstOrDefault(x => x.Player.Equals(unit.Unit)).LastSeen))
                 {
                     if (Ultimate.IsReady)
                         Player.Spellbook.CastSpell(Ultimate.Slot, GetFountainPos());
                 }
             }
+        }
+
+
+        private static void BaseUltCalcs(Recall recall)
+        {
+            float recallEndTime = recall.Started + recall.Duration;
+            float timeNeeded = GetBaseUltTravelTime(Player);
+            float recallCountDown = recallEndTime - Core.GameTickCount;
+            float delay = recallEndTime - timeNeeded - 65;
+
+            bool collision = Program.BaseUltMenu["checkcollision"].Cast<CheckBox>().CurrentValue ? GetCollision(Player.ChampionName).Any() : false;
+            var spellData = BaseUltSpells.Find(h => h.Name == Player.ChampionName);
+            var Target = enemiesInfo.FirstOrDefault(x => x.Player.Equals(recall.Unit));
+
+            if (Target == null)
+                return;
+
+            if (recallCountDown >= timeNeeded && !collision && IsTargetKillable(Target, recallCountDown)
+                && Program.BaseUltMenu["target" + recall.Unit.ChampionName].Cast<CheckBox>().CurrentValue
+                && Program.BaseUltMenu["baseult"].Cast<CheckBox>().CurrentValue
+                && !Program.BaseUltMenu["nobaseult"].Cast<KeyBind>().CurrentValue)
+            {
+                Chat.Print(String.Format("Added, firing in {0}", timeNeeded/1000));
+                BaseUltUnits.Add(new BaseUltUnit(recall.Unit, delay));
+            }
+            else if (BaseUltUnits.Any(h => h.Unit.NetworkId == recall.Unit.NetworkId))
+            {
+                BaseUltUnits.Remove(BaseUltUnits.Find(h => h.Unit.NetworkId == recall.Unit.NetworkId));
+            }
+
         }
 
         public static void Drawing_OnDraw(EventArgs args)
@@ -97,6 +132,17 @@ namespace BaseUltPlusPlus
                 DrawRect(BarX, BarY, (int)(Scale * RecallProgress), BarH, 1, System.Drawing.Color.FromArgb(100, colorIndicator));
                 DrawRect(BarX + (int)(Scale * RecallProgress), BarY + 1, 2, BarH - 1, 1, System.Drawing.Color.FromArgb(255, Color.White));
 
+                float recallEndTime = recall.Started + recall.Duration;
+                float timeNeeded = GetBaseUltTravelTime(Player);
+                float recallCountDown = recallEndTime - Core.GameTickCount;
+                float delay = recallEndTime - timeNeeded;
+
+                Text.DrawText(null, "recall " + recallEndTime.ToString(), 500, 200, new ColorBGRA(255, 255, 255, (byte)((float)255)));
+                Text.DrawText(null, "timeNeeded " + timeNeeded.ToString(), 500, 220, new ColorBGRA(255, 255, 255, (byte)((float)255)));
+                Text.DrawText(null, "recallCountDown " + recallCountDown.ToString(), 500, 240, new ColorBGRA(255, 255, 255, (byte)((float)255)));
+                Text.DrawText(null, "delay " + delay.ToString(), 500, 260, new ColorBGRA(255, 255, 255, (byte)((float)255)));
+                Text.DrawText(null, "time " + Core.GameTickCount.ToString(), 500, 280, new ColorBGRA(255, 255, 255, (byte)((float)255)));
+
                 if (isBaseUlt)
                 {
                     var unit = BaseUltUnits.FirstOrDefault(h => h.Unit.NetworkId == recall.Unit.NetworkId);
@@ -104,7 +150,7 @@ namespace BaseUltPlusPlus
                     if (unit == null)
                         continue;
 
-                    var barPos = ((recall.Started + recall.Duration) - unit.FireTime);
+                    var barPos = unit.FireTime;
 
                     DrawRect(BarX + (int)(Scale * barPos), BarY + 4, 4, BarH - 1, 1, System.Drawing.Color.FromArgb(255, Color.Yellow));
                 }
@@ -134,12 +180,81 @@ namespace BaseUltPlusPlus
             return ObjectManager.Get<Obj_SpawnPoint>().First(x => x.IsEnemy).Position;
         }
 
-        private static double GetRecallPercent(Recall recall)
+        private static bool IsTargetKillable(EnemyInfo target, float countDown)
         {
-            var recallDuration = recall.Duration;
-            var cd = recall.Started + recallDuration - Game.Time;
-            var percent = (cd > 0 && Math.Abs(recallDuration) > float.Epsilon) ? 1f - (cd/recallDuration) : 1f;
-            return percent;
+            float totalUltDamage = (float)GetBaseUltSpellDamage(target.Player, Player);
+            float targetHealth = GetTargetHealth(target, countDown);
+
+            if (totalUltDamage < targetHealth)
+                return false;
+
+            return true;
+        }
+
+        public static bool HasPotionActive(AIHeroClient hero)
+        {
+            string[] potionStrings = {
+                    RegenerationSpellBook.HealthPotion.BuffName,
+                    RegenerationSpellBook.HealthPotion.BuffNameCookie,
+                    RegenerationSpellBook.RefillablePotion.BuffName,
+                    RegenerationSpellBook.CorruptingPotion.BuffName,
+                    RegenerationSpellBook.HuntersPotion.BuffName
+                };
+
+            return hero.Buffs.Any(x => potionStrings.Contains(x.Name));
+        }
+
+        /// <summary>
+        /// per second
+        /// </summary>
+        /// <param name="buff"></param>
+        /// <returns></returns>
+        public static float GetPotionRegenRate(BuffInstance buff)
+        {
+            if (buff.Name == RegenerationSpellBook.HealthPotion.BuffName ||
+                buff.Name == RegenerationSpellBook.HealthPotion.BuffNameCookie)
+            {
+                return RegenerationSpellBook.HealthPotion.RegenRate;
+            }
+            if (buff.Name == RegenerationSpellBook.RefillablePotion.BuffName)
+            {
+                return RegenerationSpellBook.RefillablePotion.RegenRate;
+            }
+            if (buff.Name == RegenerationSpellBook.CorruptingPotion.BuffName)
+            {
+                return RegenerationSpellBook.CorruptingPotion.RegenRate;
+            }
+            if (buff.Name == RegenerationSpellBook.HuntersPotion.BuffName)
+            {
+                return RegenerationSpellBook.HuntersPotion.RegenRate;
+            }
+
+            return float.NaN;
+        }
+
+        public static BuffInstance GetPotionBuff(AIHeroClient hero)
+        {
+            string[] potionStrings = {
+                    RegenerationSpellBook.HealthPotion.BuffName,
+                    RegenerationSpellBook.HealthPotion.BuffNameCookie,
+                    RegenerationSpellBook.RefillablePotion.BuffName,
+                    RegenerationSpellBook.CorruptingPotion.BuffName,
+                    RegenerationSpellBook.HuntersPotion.BuffName
+                };
+
+            return hero.Buffs.First(x => potionStrings.Contains(x.Name));
+        }
+
+        private static float GetTargetHealth(EnemyInfo target, float additionalTime)
+        {
+            if (target.Player.IsVisible)
+                return target.Player.Health;
+
+            float regen = HasPotionActive(target.Player) ? target.Player.HPRegenRate : (target.Player.HPRegenRate + GetPotionRegenRate(GetPotionBuff(target.Player)));
+            float predictedHealth = target.Player.Health + (regen * ((Core.GameTickCount - target.LastSeen + additionalTime) / 1000f));
+
+
+            return predictedHealth > target.Player.MaxHealth ? target.Player.MaxHealth : predictedHealth;
         }
 
         private static float GetBaseUltTravelTime(AIHeroClient source, Vector3? dest = null)
@@ -214,35 +329,6 @@ namespace BaseUltPlusPlus
             }
 
             return 0;
-        }
-
-        private static void BaseUltCalcs(Recall recall)
-        {
-            float recallEndTime = recall.Started + recall.Duration;
-            float travelTime = GetBaseUltTravelTime(Player);
-            float timeLeft = recallEndTime - Core.GameTickCount;
-            float delay = recallEndTime - travelTime;
-
-
-            var spellDmg = GetBaseUltSpellDamage(recall.Unit, Player);
-            bool collision = Program.BaseUltMenu["checkcollision"].Cast<CheckBox>().CurrentValue ? GetCollision(Player.ChampionName).Any() : false;
-            var spellData = BaseUltSpells.Find(h => h.Name == Player.ChampionName);
-
-            Chat.Print(String.Format("recallEndTime {0}   delay {1}   travelTime {2}", recallEndTime, delay, travelTime));
-
-            if (travelTime <= recallEndTime && !collision && recall.Unit.Health < spellDmg
-                && Program.BaseUltMenu["target" + recall.Unit.ChampionName].Cast<CheckBox>().CurrentValue
-                && Program.BaseUltMenu["baseult"].Cast<CheckBox>().CurrentValue
-                && !Program.BaseUltMenu["nobaseult"].Cast<KeyBind>().CurrentValue)
-            {
-                Chat.Print("Added");
-                BaseUltUnits.Add(new BaseUltUnit(recall.Unit, delay + Core.GameTickCount));
-            }
-            else if (BaseUltUnits.Any(h => h.Unit.NetworkId == recall.Unit.NetworkId))
-            {
-                BaseUltUnits.Remove(BaseUltUnits.Find(h => h.Unit.NetworkId == recall.Unit.NetworkId));
-            }
-            
         }
 
         public static void Teleport_OnTeleport(Obj_AI_Base sender, Teleport.TeleportEventArgs args)
@@ -326,6 +412,51 @@ namespace BaseUltPlusPlus
         {
             Text.OnLostDevice();
         }
+
+        /// <summary>
+        /// Regens per second
+        /// </summary>
+        private class RegenerationSpellBook
+        {
+            public static class HealthPotion
+            {
+                public static string BuffName = "RegenerationPotion";
+                public static string BuffNameCookie = "ItemMiniRegenPotion";
+                public static float RegenRate
+                {
+                    get { return 10; }
+                }
+                public static float Duration = 15000;
+            }
+            public static class RefillablePotion
+            {
+                public static string BuffName = "ItemCrystalFlask";
+                public static float RegenRate
+                {
+                    get { return 10; }
+                }
+                public static float Duration = 12000;
+            }
+
+            public static class HuntersPotion
+            {
+                public static string BuffName = "ItemCrystalFlaskJungle";
+                public static float RegenRate
+                {
+                    get { return 9; }
+                }
+                public static float Duration = 8000;
+            }
+            public static class CorruptingPotion
+            {
+                public static string BuffName = "ItemDarkCrystalFlask";
+                public static float RegenRate
+                {
+                    get { return 16; }
+                }
+                public static float Duration = 12000;
+            }
+        }
     }
 
     public class Recall
@@ -353,9 +484,19 @@ namespace BaseUltPlusPlus
 
         public AIHeroClient Unit { get; set; }
         public float FireTime { get; set; }
-        public float LastSeen { get; set; }
     }
+    
+    public class EnemyInfo
+    {
+        public AIHeroClient Player;
+        public float LastSeen;
 
+        public EnemyInfo(AIHeroClient player)
+        {
+            Player = player;
+            LastSeen = 0;
+        }
+    }
     public class BaseUltSpell
     {
         public BaseUltSpell(string name, SpellSlot slot, float delay, float speed, float radius, bool collision)
