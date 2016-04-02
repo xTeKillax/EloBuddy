@@ -89,7 +89,7 @@ namespace BaseUltPlusPlus
             float recallEndTime = recall.Started + recall.Duration;
             float timeNeeded = GetBaseUltTravelTime(Player);
             float recallCountDown = recallEndTime - Core.GameTickCount;
-            float delay = recallEndTime - timeNeeded - 65;
+            float delay = recallEndTime - timeNeeded;
 
             bool collision = Program.BaseUltMenu["checkcollision"].Cast<CheckBox>().CurrentValue ? GetCollision(Player.ChampionName).Any() : false;
             var spellData = BaseUltSpells.Find(h => h.Name == Player.ChampionName);
@@ -255,8 +255,9 @@ namespace BaseUltPlusPlus
                 float distance = source.ServerPosition.Distance(targetpos);
 
                 float missilespeed = speed;
+                bool isJinx = source.ChampionName.ToLower().Contains("jinx");
 
-                if (source.ChampionName.ToLower().Contains("jinx") && distance > 1350)
+                if (isJinx && distance > 1350)
                 {
                     const float accelerationrate = 0.3f; //= (1500f - 1350f) / (2200 - speed), 1 unit = 0.3units/second
 
@@ -271,7 +272,8 @@ namespace BaseUltPlusPlus
                         difference * 2200f) / distance;
                 }
 
-                return (distance / missilespeed + delay) * 1000;
+                var result = (distance / missilespeed + delay) * 1000;
+                return isJinx ? (result-65) : result;
             }
             catch
             {
