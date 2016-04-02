@@ -46,9 +46,6 @@ namespace BaseUltPlusPlus
             BaseUltSpells.Add(new BaseUltSpell("Ashe", SpellSlot.R, 250 / 1000f, 1600, 130, true));
             BaseUltSpells.Add(new BaseUltSpell("Draven", SpellSlot.R, 400 / 1000f, 2000, 160, true));
             BaseUltSpells.Add(new BaseUltSpell("Karthus", SpellSlot.R, 3125 / 1000f, 0, 0, false));
-            BaseUltSpells.Add(new BaseUltSpell("Ziggs", SpellSlot.Q, 250 / 1000f, 3100, 0, false));
-            BaseUltSpells.Add(new BaseUltSpell("Lux", SpellSlot.R, 1375 / 1000f, 0, 0, false));
-            BaseUltSpells.Add(new BaseUltSpell("Xerath", SpellSlot.R, 700 / 1000f, 600, 0, false));
 
             #endregion
 
