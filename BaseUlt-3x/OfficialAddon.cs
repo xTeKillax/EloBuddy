@@ -273,7 +273,7 @@ namespace BaseUltPlusPlus
                 }
 
                 var result = (distance / missilespeed + delay) * 1000;
-                return isJinx ? (result-65) : result;
+                return isJinx ? (result+65) : result;
             }
             catch
             {
