@@ -38,7 +38,7 @@ namespace BaseUltPlusPlus
 
             BaseUltMenu.AddGroupLabel("BaseUlt-3x - By BestAkaliAfrica");
             BaseUltMenu.AddLabel("Based on Roach_ version of LunarBlue Addon");
-            BaseUltMenu.AddLabel("FinnDev, MrOwl, Beaving, DanThePman");
+            BaseUltMenu.AddLabel("FinnDev, MrOwl, Beaving, DanThePman, Gabe2901");
 
             // Initialize the Addon
             OfficialAddon.Initialize();
