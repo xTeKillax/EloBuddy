@@ -233,11 +233,14 @@ namespace BaseUltPlusPlus
 
         private static float GetTargetHealth(EnemyInfo target, float additionalTime)
         {
-            if (target.Player.IsVisible)
+            if (target.Player.IsHPBarRendered)
                 return target.Player.Health;
 
-            float regen = HasPotionActive(target.Player) ? target.Player.HPRegenRate : (target.Player.HPRegenRate + GetPotionRegenRate(GetPotionBuff(target.Player)));
+            float regen = /*HasPotionActive(target.Player) ? */target.Player.HPRegenRate /*: (target.Player.HPRegenRate + GetPotionRegenRate(GetPotionBuff(target.Player)))*/;
+
             float predictedHealth = target.Player.Health + (regen * ((Core.GameTickCount - target.LastSeen + additionalTime) / 1000f));
+
+            //Chat.Print(String.Format("pred {0}      regen {1}", predictedHealth, regen));
 
 
             return predictedHealth > target.Player.MaxHealth ? target.Player.MaxHealth : predictedHealth;
