@@ -29,7 +29,7 @@ namespace BaseUltPlusPlus
         
         
         private static Font Text;
-        private static float BarX = Drawing.Width * 0.425f;
+        private static float BarX = Drawing.Width * 0.415f;
         private static float BarY = Drawing.Height * 0.80f;
         private static int BarW = (int)(Drawing.Width - 2 * BarX);
         private static float Scale = (float)BarW / 8000;
@@ -37,7 +37,7 @@ namespace BaseUltPlusPlus
 
         public static void Initialize()
         {
-            Text = new Font(Drawing.Direct3DDevice, new FontDescription { FaceName = "Calibri", Height = 23, Width = 12, OutputPrecision = FontPrecision.Default, Quality = FontQuality.Default });
+            Text = new Font(Drawing.Direct3DDevice, new FontDescription { FaceName = "Calibri", Height = 13, Width = 6, OutputPrecision = FontPrecision.Default, Quality = FontQuality.Default });
 
             #region Spells
 
@@ -106,7 +106,6 @@ namespace BaseUltPlusPlus
                 && Program.BaseUltMenu["baseult"].Cast<CheckBox>().CurrentValue
                 && !Program.BaseUltMenu["nobaseult"].Cast<KeyBind>().CurrentValue)
             {
-                Chat.Print(String.Format("Added, firing in {0}", timeNeeded/1000));
                 BaseUltUnits.Add(new BaseUltUnit(recall.Unit, delay));
             }
             else if (BaseUltUnits.Any(h => h.Unit.NetworkId == recall.Unit.NetworkId))
@@ -132,17 +131,6 @@ namespace BaseUltPlusPlus
                 DrawRect(BarX, BarY, (int)(Scale * RecallProgress), BarH, 1, System.Drawing.Color.FromArgb(100, colorIndicator));
                 DrawRect(BarX + (int)(Scale * RecallProgress), BarY + 1, 2, BarH - 1, 1, System.Drawing.Color.FromArgb(255, Color.White));
 
-                float recallEndTime = recall.Started + recall.Duration;
-                float timeNeeded = GetBaseUltTravelTime(Player);
-                float recallCountDown = recallEndTime - Core.GameTickCount;
-                float delay = recallEndTime - timeNeeded;
-
-                Text.DrawText(null, "recall " + recallEndTime.ToString(), 500, 200, new ColorBGRA(255, 255, 255, (byte)((float)255)));
-                Text.DrawText(null, "timeNeeded " + timeNeeded.ToString(), 500, 220, new ColorBGRA(255, 255, 255, (byte)((float)255)));
-                Text.DrawText(null, "recallCountDown " + recallCountDown.ToString(), 500, 240, new ColorBGRA(255, 255, 255, (byte)((float)255)));
-                Text.DrawText(null, "delay " + delay.ToString(), 500, 260, new ColorBGRA(255, 255, 255, (byte)((float)255)));
-                Text.DrawText(null, "time " + Core.GameTickCount.ToString(), 500, 280, new ColorBGRA(255, 255, 255, (byte)((float)255)));
-
                 if (isBaseUlt)
                 {
                     var unit = BaseUltUnits.FirstOrDefault(h => h.Unit.NetworkId == recall.Unit.NetworkId);
@@ -150,9 +138,7 @@ namespace BaseUltPlusPlus
                     if (unit == null)
                         continue;
 
-                    var barPos = unit.FireTime;
-
-                    DrawRect(BarX + (int)(Scale * barPos), BarY + 4, 4, BarH - 1, 1, System.Drawing.Color.FromArgb(255, Color.Yellow));
+                    DrawRect(BarX + (int)(Scale * unit.FireTime), BarY + 4, 4, BarH - 1, 1, System.Drawing.Color.FromArgb(255, Color.Black));
                 }
 
                 Text.DrawText(null, recall.Unit.BaseSkinName, (int)BarX + (int)(Scale * RecallProgress - (float)(recall.Unit.BaseSkinName.Length * Text.Description.Width) / 2), (int)BarY - 5 - Text.Description.Height - 1, new ColorBGRA(255, 255, 255, (byte)((float)255)));
