@@ -77,7 +77,7 @@ namespace BaseUltPlusPlus
 
                 if (Math.Round(unit.FireTime, 1) <= Core.GameTickCount && ((Core.GameTickCount - timeLimit) >= enemiesInfo.FirstOrDefault(x => x.Player.Equals(unit.Unit)).LastSeen))
                 {
-                    if (Ultimate.IsReady)
+                    if (Ultimate.IsReady && !Program.BaseUltMenu["nobaseult"].Cast<KeyBind>().CurrentValue)
                         Player.Spellbook.CastSpell(Ultimate.Slot, GetFountainPos());
                 }
             }
@@ -100,8 +100,7 @@ namespace BaseUltPlusPlus
 
             if (recallCountDown >= timeNeeded && !collision && IsTargetKillable(Target, recallCountDown)
                 && Program.BaseUltMenu["target" + recall.Unit.ChampionName].Cast<CheckBox>().CurrentValue
-                && Program.BaseUltMenu["baseult"].Cast<CheckBox>().CurrentValue
-                && !Program.BaseUltMenu["nobaseult"].Cast<KeyBind>().CurrentValue)
+                && Program.BaseUltMenu["baseult"].Cast<CheckBox>().CurrentValue)
             {
                 BaseUltUnits.Add(new BaseUltUnit(recall.Unit, delay));
             }
@@ -273,7 +272,7 @@ namespace BaseUltPlusPlus
                 }
 
                 var result = (distance / missilespeed + delay) * 1000;
-                return isJinx ? (result-65) : result;
+                return isJinx ? (result+65) : result;
             }
             catch
             {
