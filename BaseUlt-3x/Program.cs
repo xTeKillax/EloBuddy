@@ -40,6 +40,7 @@ namespace BaseUltPlusPlus
             BaseUltMenu.AddLabel("Based on Roach_ version of LunarBlue Addon");
             BaseUltMenu.AddLabel("FinnDev, MrOwl, Beaving, DanThePman, Gabe2901");
 
+            Chat.Print("<font color = \"#6B9FE3\">BaseUlt-3x</font><font color = \"#E3AF6B\"> by BestAkaliAfrica</font>. You like ? Buy me a coffee :p");
             // Initialize the Addon
             OfficialAddon.Initialize();
 
