@@ -16,7 +16,7 @@ namespace JaKCass
         static SpellManager()
         {
             Q = new Spell.Skillshot(SpellSlot.Q, 850, EloBuddy.SDK.Enumerations.SkillShotType.Circular, 400, null, 130);
-            W = new Spell.Skillshot(SpellSlot.W, 850, EloBuddy.SDK.Enumerations.SkillShotType.Circular, 250, 2500, 106);
+            W = new Spell.Skillshot(SpellSlot.W, 850, EloBuddy.SDK.Enumerations.SkillShotType.Circular, 250, 2500, 125);
             E = new Spell.Targeted(SpellSlot.E, 700){ CastDelay = 125 };
             R = new Spell.Skillshot(SpellSlot.R, 825, EloBuddy.SDK.Enumerations.SkillShotType.Cone, 500, null, 80);
         }
