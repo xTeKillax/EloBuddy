@@ -69,7 +69,8 @@ namespace JaKCass
                 }
             });
 
-            if (!SpellManager.Q.IsReady() && (Environment.TickCount > (Program.lastQcastTime + 870)) && Program.QisCasting) { Program.QisCasting = false; Chat.Print("Q casted"); }
+            if (!SpellManager.Q.IsReady() && (Environment.TickCount > (Program.lastQcastTime + 870)) && Program.QisCasting) 
+                Program.QisCasting = false;
 
             if(Config.Misc.AutoLevelUp)
             {
