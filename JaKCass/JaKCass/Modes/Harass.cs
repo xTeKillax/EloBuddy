@@ -32,7 +32,7 @@ namespace JaKCass.Modes
                 if (Q.IsReady() && Q.IsInRange(target) && !Utilities.Combat.isPoisoned(target) && (((Program.lastQcastTime + rnd.Next(0, Config.Skills.qDelay)) <= Environment.TickCount) || !Config.Skills.legitQ))
                 {
                     var QPred = Q.GetPrediction(target);
-                    if (QPred.HitChancePercent >= 80)
+                    if (QPred.HitChancePercent >= 85)
                         Q.Cast(QPred.CastPosition);
                 }
             }

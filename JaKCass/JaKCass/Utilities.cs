@@ -91,4 +91,27 @@ namespace JaKCass.Utilities
             return result;
         }
     }
+
+    public static class Map
+    {
+        public static bool IsWall(Vector2 pos)
+        {
+            return (NavMesh.GetCollisionFlags(pos.X, pos.Y) == CollisionFlags.Wall ||
+            NavMesh.GetCollisionFlags(pos.X, pos.Y) == CollisionFlags.Building);
+        }
+
+        public static bool IsWallBetween(Vector3 start, Vector3 end)
+        {
+            double count = Vector3.Distance(start, end);
+            for (uint i = 0; i <= count; i += 10)
+            {
+                Vector2 pos = start.Extend(end, i);
+
+                if (IsWall(pos))
+                    return true;
+            }
+
+            return false;
+        }
+    }
 }

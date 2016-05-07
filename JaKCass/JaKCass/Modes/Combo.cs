@@ -31,10 +31,10 @@ namespace JaKCass.Modes
             Combat.CastItems(target);
 
             if(Config.Skills.initDash)
-                if (W.IsReady() && W.IsInRange(target) && Program.DashingChamps.Contains(target.ChampionName))
+                if (W.IsReady() && W.IsInRange(target) && Player.Instance.Distance(target) >= SpellManager.WMinRange && Program.DashingChamps.Contains(target.ChampionName))
                     {
                         var WPred = W.GetPrediction(target);
-                        if(WPred.HitChancePercent >= 70)
+                        if(WPred.HitChancePercent >= 85 && !Map.IsWallBetween(Player.Instance.Position, WPred.CastPosition))
                             W.Cast(WPred.CastPosition);
                     }
 
@@ -62,8 +62,12 @@ namespace JaKCass.Modes
             //If Q not ready and we dont care using W
             //OR we are not casting Q and the target is not poisoned and we keep W only for safeW
             if (Config.Modes.Combo.UseW)
-                if((!Q.IsReady() && !Config.Skills.SafeW) || (!Program.QisCasting && !Utilities.Combat.isPoisoned(target) && Config.Skills.SafeW))
-                    W.Cast(target);
+                if ((!Q.IsReady() && !Config.Skills.SafeW) || (!Program.QisCasting && !Utilities.Combat.isPoisoned(target) && Config.Skills.SafeW) && W.IsReady() && W.IsInRange(target) && Player.Instance.Distance(target) >= SpellManager.WMinRange)
+                {
+                    var WPred = W.GetPrediction(target);
+                    if (WPred.HitChancePercent >= 85 && !Map.IsWallBetween(Player.Instance.Position, WPred.CastPosition))
+                        W.Cast(WPred.CastPosition);
+                }
 
             if (Config.Modes.Combo.UseR)
                 if (!Q.IsReady() && !E.IsReady() && R.IsReady())
