@@ -12,12 +12,12 @@ namespace JaKCass
         public static Spell.Skillshot W { get; private set; }
         public static Spell.Targeted E { get; private set; }
         public static Spell.Skillshot R { get; private set; }
-        public static int WMinRange = 550;
+        public static int WMinRange = 500;
 
         static SpellManager()
         {
-            Q = new Spell.Skillshot(SpellSlot.Q, 750, EloBuddy.SDK.Enumerations.SkillShotType.Circular, 400, null, 130);
-            W = new Spell.Skillshot(SpellSlot.W, 800, EloBuddy.SDK.Enumerations.SkillShotType.Cone, spellWidth: 160);
+            Q = new Spell.Skillshot(SpellSlot.Q, 850, EloBuddy.SDK.Enumerations.SkillShotType.Circular, 400, null, 130);
+            W = new Spell.Skillshot(SpellSlot.W, 900, EloBuddy.SDK.Enumerations.SkillShotType.Cone, spellWidth: 160);
             E = new Spell.Targeted(SpellSlot.E, 700){ CastDelay = 125 };
             R = new Spell.Skillshot(SpellSlot.R, 825, EloBuddy.SDK.Enumerations.SkillShotType.Cone, 500, null, 80);
         }

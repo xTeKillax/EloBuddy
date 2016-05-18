@@ -34,7 +34,7 @@ namespace JaKCass.Modes
                 if (W.IsReady() && W.IsInRange(target) && Player.Instance.Distance(target) >= SpellManager.WMinRange && Program.DashingChamps.Contains(target.ChampionName))
                     {
                         var WPred = W.GetPrediction(target);
-                        if(WPred.HitChancePercent >= 85 && !Map.IsWallBetween(Player.Instance.Position, WPred.CastPosition))
+                        if(WPred.HitChancePercent >= 85)
                             W.Cast(WPred.CastPosition);
                     }
 
@@ -65,7 +65,7 @@ namespace JaKCass.Modes
                 if ((!Q.IsReady() && !Config.Skills.SafeW) || (!Program.QisCasting && !Utilities.Combat.isPoisoned(target) && Config.Skills.SafeW) && W.IsReady() && W.IsInRange(target) && Player.Instance.Distance(target) >= SpellManager.WMinRange)
                 {
                     var WPred = W.GetPrediction(target);
-                    if (WPred.HitChancePercent >= 85 && !Map.IsWallBetween(Player.Instance.Position, WPred.CastPosition))
+                    if (WPred.HitChancePercent >= 85)
                         W.Cast(WPred.CastPosition);
                 }
 
