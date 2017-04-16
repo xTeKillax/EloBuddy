@@ -31,7 +31,7 @@ namespace AkaliShadow.Modes
             Combat.CastItems(target);
 
             //If marked we will do everything to proc it
-            if (Combat.HasBuff(target, "AkaliMota"))
+            if (Combat.HasBuff(target, "AkaliMota") || Program.QInAir)
             {
                 if(Player.Instance.Distance(target) <= Player.Instance.GetAutoAttackRange())
                 {
